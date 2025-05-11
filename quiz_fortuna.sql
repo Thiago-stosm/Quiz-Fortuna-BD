@@ -30,26 +30,29 @@ CREATE TABLE materia(
 CREATE TABLE questao(
 	id_questao INT PRIMARY KEY AUTO_INCREMENT,
 	enunciado VARCHAR(200) NOT NULL,
-	dica VARCHAR(200),
 	explicacao_erro VARCHAR(200),
-	resposta_correta VARCHAR(10) NOT NULL,
-	FOREIGN KEY (id_nivel_dificuldade) REFERENCES nivel_dificuldade(id_nivel),
-	FOREIGN KEY (materia_id) REFERENCES materia(id_materia),
-	ano_letivo INT NOT NULL
+	resposta_correta CHAR(1) NOT NULL,
+	ano_letivo INT NOT NULL,
+	nivel_id INT,
+	materia_id INT,
+	FOREIGN KEY (nivel_id) REFERENCES nivel_dificuldade(id_nivel),
+	FOREIGN KEY (materia_id) REFERENCES materia(id_materia)
 );
 
 CREATE TABLE alternativa(
 	id_alternativa INT PRIMARY KEY AUTO_INCREMENT,
-	FOREIGN KEY (questao_id) REFERENCES questao(id_questao),
-	letra VARCHAR(10) NOT NULL,
-	texto VARCHAR(100) NOT NULL
+	letra CHAR(1) NOT NULL,
+	texto VARCHAR(100) NOT NULL,
+	questao_id INT,
+	FOREIGN KEY (questao_id) REFERENCES questao(id_questao)
 );
 
 CREATE TABLE ranking(
 	id_ranking INT PRIMARY KEY AUTO_INCREMENT,
-	FOREIGN KEY (aluno_id) REFERENCES aluno(id_aluno),
+	aluno_id INT,
 	pontuacao DOUBLE, 
-	ultima_atualizacao DATE
+	ultima_atualizacao DATE,
+	FOREIGN KEY (aluno_id) REFERENCES aluno(id_aluno)
 );
 
 CREATE TABLE premio(
@@ -61,12 +64,13 @@ CREATE TABLE premio(
 
 CREATE TABLE historico_jogo(
 	id_historico INT PRIMARY KEY AUTO_INCREMENT,
-	FOREIGN KEY (aluno_id) REFERENCES aluno(id_aluno),
 	data_partida DATE,
 	acertos INT NOT NULL,
 	erros INT NOT NULL,
 	checkpoint_alcancado VARCHAR(100),
-	pontuacao_total DOUBLE
+	pontuacao_total DOUBLE,
+	aluno_id INT,
+	FOREIGN KEY (aluno_id) REFERENCES aluno(id_aluno)
 );
 
 CREATE TABLE ajuda(
@@ -76,26 +80,32 @@ CREATE TABLE ajuda(
 
 CREATE TABLE sessao_jogo(
 	id_sessao INT PRIMARY KEY AUTO_INCREMENT,
-	FOREIGN KEY (aluno_id) REFERENCES aluno(id_aluno),
 	data_inicio DATE,
 	data_fim DATE, 
 	modo_pratica BOOLEAN,
-	pontuacao_total DOUBLE
+	pontuacao_total DOUBLE,
+	aluno_id INT,
+	FOREIGN KEY (aluno_id) REFERENCES aluno(id_aluno)
 );
 
 CREATE TABLE resposta_aluno(
 	id_resposta INT PRIMARY KEY AUTO_INCREMENT,
-	FOREIGN KEY (sessao_id) REFERENCES sessao_jogo(id_sessao),
-	FOREIGN KEY (questao_id) REFERENCES questao(id_questao),
-	alternativa_respondida VARCHAR(10),
+	alternativa_respondida CHAR(1),
 	correta BOOLEAN NOT NULL,
-	tempo_resposta DOUBLE 
+	tempo_resposta DOUBLE,
+	sessao_id INT, 
+	questao_id INT,
+	FOREIGN KEY (sessao_id) REFERENCES sessao_jogo(id_sessao),
+	FOREIGN KEY (questao_id) REFERENCES questao(id_questao)
 );
 
 CREATE TABLE ajuda_utilizada(
 	id_utilizacao INT PRIMARY KEY AUTO_INCREMENT,
+	data_hora TIMESTAMP,
+	sessao_id INT,
+	ajuda_id INT,
+	questao_id INT,
 	FOREIGN KEY (sessao_id) REFERENCES sessao_jogo(id_sessao),
 	FOREIGN KEY (ajuda_id) REFERENCES ajuda(id_ajuda),
-	FOREIGN KEY (questao_id) REFERENCES questao(id_questao),
-	data_hora TIMESTAMP
+	FOREIGN KEY (questao_id) REFERENCES questao(id_questao)
 );
